@@ -14,7 +14,6 @@ public class OrderStatusUpdateJob {
     // Scheduled to run every hour using cron expression
     @Scheduled(cron = "0 0 * * * ?")  // Runs at the start of every hour
     public void updateOrders() {
-        // Call the service to update the orders
         orderService.updateNewOrdersToDispatched();
     }
 }

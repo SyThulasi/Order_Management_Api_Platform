@@ -10,20 +10,25 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Handles exceptions globally for the application.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    // Handle custom application exceptions
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<String> handleCustomException(CustomException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    // Handle general exceptions
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGeneralException(Exception ex) {
         return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // Handle validation exceptions
+    // Handle validation exceptions and return field-specific error messages
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();

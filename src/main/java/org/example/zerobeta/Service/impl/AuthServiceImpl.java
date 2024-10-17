@@ -27,13 +27,16 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    // Handles user registration
     @Override
     public ResponseEntity<AuthenticationResponseDTO> register(@Valid RegisterRequestDto request) {
 
+        // Check if email is already registered
         if (clientRepository.findByEmail(request.getEmail()).isPresent()) {
             return createResponseEntity(null, "Email already exists: " + request.getEmail(), HttpStatus.BAD_REQUEST);
         }
 
+        // Create new client
         var client = Client.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
@@ -55,7 +58,7 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-
+    // Handles user authentication (login)
     @Override
     public ResponseEntity<AuthenticationResponseDTO> authenticate(@Valid AuthenticationRequestDto request) {
 
@@ -84,6 +87,7 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    // Utility method to create response entity for authentication/register requests
     private ResponseEntity<AuthenticationResponseDTO> createResponseEntity(String token, String message, HttpStatus status) {
         return ResponseEntity.status(status).body(AuthenticationResponseDTO.builder()
                 .token(token)

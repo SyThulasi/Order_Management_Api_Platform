@@ -37,6 +37,7 @@ public class Order {
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
+    // Set timestamp before persisting the order
     @PrePersist
     public void prePersist() {
         this.timestamp = LocalDateTime.now();

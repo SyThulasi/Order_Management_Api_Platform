@@ -23,25 +23,14 @@ public class ApplicationConfig {
 
     private final ClientRepository clientRepository;
 
-    /**
-     * Bean for retrieving user details based on the provided username (email).
-     * This service loads the user by their email and throws an exception if the user is not found.
-     *
-     * @return UserDetailsService that loads user details based on email.
-     */
+    // Bean to load user details by email
     @Bean
     public UserDetailsService userDetailsService(){
         return username -> clientRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    /**
-     * Bean for setting up the AuthenticationProvider, which is responsible for authenticating users.
-     * It uses the DaoAuthenticationProvider to authenticate users against the UserDetailsService and
-     * checks the encoded password with the BCryptPasswordEncoder.
-     *
-     * @return AuthenticationProvider that is responsible for user authentication.
-     */
+    // Bean for setting up DaoAuthenticationProvider with user details and password encoding
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
@@ -50,25 +39,13 @@ public class ApplicationConfig {
         return authenticationProvider;
     }
 
-    /**
-     * Bean for configuring the AuthenticationManager, which is used to authenticate users.
-     * The AuthenticationManager is a central interface for Spring Security's authentication mechanism.
-     *
-     * @param config The AuthenticationConfiguration provided by Spring Security.
-     * @return AuthenticationManager to handle user authentication.
-     * @throws Exception if the configuration fails.
-     */
+    // Bean to provide the AuthenticationManager for handling authentication
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    /**
-     * Bean for password encoding, using BCryptPasswordEncoder.
-     * BCrypt is a hashing function designed for secure password storage, which prevents rainbow table attacks.
-     *
-     * @return PasswordEncoder that uses BCrypt for password hashing.
-     */
+    // Bean for encoding passwords using BCrypt
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();

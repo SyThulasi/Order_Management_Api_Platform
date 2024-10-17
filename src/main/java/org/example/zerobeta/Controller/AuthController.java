@@ -19,6 +19,7 @@ public class AuthController {
 
     private final AuthService authService;
 
+    // Handle Client registration
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponseDTO> register(
             @Valid @RequestBody RegisterRequestDto request
@@ -26,6 +27,7 @@ public class AuthController {
         return authService.register(request);
     }
 
+    // Handle user authentication (login)
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponseDTO> authenticate(
             @Valid @RequestBody AuthenticationRequestDto request

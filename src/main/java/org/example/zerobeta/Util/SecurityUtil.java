@@ -8,6 +8,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+/**
+ * Utility class to retrieve the authenticated client from the security context.
+ */
 @Component
 @RequiredArgsConstructor
 public class SecurityUtil {
@@ -21,6 +24,7 @@ public class SecurityUtil {
 
         if (principal instanceof UserDetails) {
             String email = ((UserDetails) principal).getUsername();
+            // Find and return the client by email
             return clientRepository.findByEmail(email)
                     .orElseThrow(() -> new CustomException("Client not found"));
         } else {

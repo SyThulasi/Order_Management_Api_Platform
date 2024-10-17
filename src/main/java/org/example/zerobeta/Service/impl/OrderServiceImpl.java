@@ -26,6 +26,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final SecurityUtil securityUtil;
 
+    // Place a new order
     @Transactional
     @Override
     public OrderResponseDTO placeOrder(@Valid OrderRequestDTO orderRequestDTO) {
@@ -55,11 +56,24 @@ public class OrderServiceImpl implements OrderService {
         );
     }
 
+    // Cancel an existing order
     @Transactional
     public String cancelOrder(Long orderId) {
+
+        // Get the authenticated client
+        Client client = securityUtil.getAuthenticatedClient();
+
         // Find the order by ID
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new CustomException("Order not found"));
+
+        if (!client.getId().equals(order.getClient().getId())){
+            throw new CustomException("You are not authorized to cancel this order.");
+        }
+
+        if (order.getStatus().equals(OrderStatus.CANCELLED)){
+            throw new CustomException("This order is already cancelled.");
+        }
 
         // Check if the order is in NEW status
         if (!order.getStatus().equals(OrderStatus.NEW)) {
@@ -73,6 +87,7 @@ public class OrderServiceImpl implements OrderService {
         return "Order with ID " + orderId + " has been canceled successfully.";
     }
 
+    // Fetch paginated order history for a client
     @Override
     public List<OrderResponseDTO> getOrderHistory(int page, int size) {
 
@@ -97,7 +112,7 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toList());
     }
 
-    // Fetch all NEW orders and update them to DISPATCHED
+    // Update all NEW orders to DISPATCHED
     @Transactional
     public void updateNewOrdersToDispatched() {
         // Find all NEW orders
