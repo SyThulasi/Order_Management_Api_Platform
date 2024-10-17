@@ -2,7 +2,6 @@ package org.example.zerobeta.Controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.zerobeta.DTO.CancelOrderRequestDTO;
 import org.example.zerobeta.DTO.OrderRequestDTO;
 import org.example.zerobeta.DTO.OrderResponseDTO;
 import org.example.zerobeta.Service.OrderService;
@@ -24,19 +23,18 @@ public class OrderController {
     }
 
     @PostMapping("/cancel-order")
-    public ResponseEntity<String> cancelOrder(@Valid @RequestBody CancelOrderRequestDTO cancelOrderRequest) {
-        String responseMessage = orderService.cancelOrder(cancelOrderRequest);
+    public ResponseEntity<String> cancelOrder(@RequestParam Long orderId) {
+        String responseMessage = orderService.cancelOrder(orderId);
         return ResponseEntity.ok(responseMessage);
     }
 
     @GetMapping("/history")
     public ResponseEntity<List<OrderResponseDTO>> getOrderHistory(
-            @RequestParam Long clientId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         // Fetch the order history using the service method
-        List<OrderResponseDTO> orderHistory = orderService.getOrderHistory(clientId, page, size);
+        List<OrderResponseDTO> orderHistory = orderService.getOrderHistory(page, size);
 
         // Return the response entity with the list of paginated orders
         return ResponseEntity.ok(orderHistory);

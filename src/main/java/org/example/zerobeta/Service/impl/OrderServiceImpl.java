@@ -2,7 +2,6 @@ package org.example.zerobeta.Service.impl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.zerobeta.DTO.CancelOrderRequestDTO;
 import org.example.zerobeta.DTO.OrderRequestDTO;
 import org.example.zerobeta.DTO.OrderResponseDTO;
 import org.example.zerobeta.Exception.CustomException;
@@ -57,9 +56,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Transactional
-    public String cancelOrder(CancelOrderRequestDTO cancelOrderRequest) {
+    public String cancelOrder(Long orderId) {
         // Find the order by ID
-        Order order = orderRepository.findById(cancelOrderRequest.getOrderId())
+        Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new CustomException("Order not found"));
 
         // Check if the order is in NEW status
@@ -71,16 +70,20 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order); // Save the updated order
 
-        return "Order with ID " + cancelOrderRequest.getOrderId() + " has been canceled successfully.";
+        return "Order with ID " + orderId + " has been canceled successfully.";
     }
 
     @Override
-    public List<OrderResponseDTO> getOrderHistory(Long clientId, int page, int size) {
+    public List<OrderResponseDTO> getOrderHistory(int page, int size) {
+
+        // Get the authenticated client
+        Client client = securityUtil.getAuthenticatedClient();
+
         // Create a PageRequest object
         PageRequest pageRequest = PageRequest.of(page, size);
 
         // Fetch the paginated orders for the client
-        Page<Order> orderPage = orderRepository.findByClientId(clientId, pageRequest);
+        Page<Order> orderPage = orderRepository.findByClientId(client.getId(), pageRequest);
 
         // Convert the orders to OrderResponseDTO
         return orderPage.stream()
