@@ -11,6 +11,8 @@ import org.example.zerobeta.Model.OrderStatus;
 import org.example.zerobeta.Repository.OrderRepository;
 import org.example.zerobeta.Service.OrderService;
 import org.example.zerobeta.Util.SecurityUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
+    private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
     private final OrderRepository orderRepository;
     private final SecurityUtil securityUtil;
 
@@ -124,6 +127,6 @@ public class OrderServiceImpl implements OrderService {
             orderRepository.save(order);  // Save the updated order
         });
 
-        System.out.println("Updated " + newOrders.size() + " orders from NEW to DISPATCHED.");
+        log.info("Updated " + newOrders.size() + " orders from NEW to DISPATCHED.");
     }
 }
