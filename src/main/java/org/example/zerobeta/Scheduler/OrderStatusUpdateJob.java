@@ -12,7 +12,7 @@ public class OrderStatusUpdateJob {
     private final OrderService orderService;
 
     // Scheduled to run every hour using cron expression
-    @Scheduled(cron = "0 0 * * * ?")  // Runs at the start of every hour
+    @Scheduled(cron = "0 0 * * * *")  // Runs at the start of every hour
     public void updateOrders() {
         orderService.updateNewOrdersToDispatched();
     }

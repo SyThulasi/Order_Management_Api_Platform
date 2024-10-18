@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  app:
+    image: sythulasi/orderapiplatform:0.0.1
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/orderapi_db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=root
+    depends_on:
+      - db
+    networks:
+      - zerobeta-network
+
+  db:
+    image: mysql:8.0
+    environment:
+      DATABASE_HOST: docker-mysql
+      DATABASE_PORT: 3306
+      MYSQL_DATABASE: orderapi_db
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: root
+    ports:
+      - "3306:3306"
+    networks:
+      - zerobeta-network
+    volumes:
+      - db_data:/var/lib/mysql
+
+networks:
+  zerobeta-network:
+    driver: bridge
+
+volumes:
+  db_data:
