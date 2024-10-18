@@ -23,18 +23,14 @@ public class SecurityConfiguration {
         http
                 // Disable CSRF (since using stateless session with JWT)
                 .csrf(csrf -> csrf.disable())
-                // Allow unauthenticated access to auth endpoints, authenticate others
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                // Set session management to stateless (no sessions, JWT used instead)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                // Set custom authentication provider
                 .authenticationProvider(authenticationProvider)
-                // Add JWT filter before UsernamePasswordAuthenticationFilter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build(); // Build the SecurityFilterChain
     }
