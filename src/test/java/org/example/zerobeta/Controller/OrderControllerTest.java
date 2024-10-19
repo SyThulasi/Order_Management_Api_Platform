@@ -22,8 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.mockito.ArgumentMatchers.any;
@@ -83,7 +82,7 @@ public class OrderControllerTest {
 
         when(orderService.cancelOrder(orderId)).thenReturn(expectedResponse);
 
-        mockMvc.perform(post("/api/v1/order/cancel-order")
+        mockMvc.perform(put("/api/v1/order/cancel-order")
                         .param("orderId", String.valueOf(orderId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value(expectedResponse));
@@ -96,7 +95,7 @@ public class OrderControllerTest {
 
         when(orderService.cancelOrder(orderId)).thenThrow(new CustomException(expectedErrorMessage));
 
-        mockMvc.perform(post("/api/v1/order/cancel-order")
+        mockMvc.perform(put("/api/v1/order/cancel-order")
                         .param("orderId", String.valueOf(orderId)))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertEquals(expectedErrorMessage, result.getResolvedException().getMessage()));

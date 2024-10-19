@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: sythulasi/orderapiplatform:0.0.1
+    image: sythulasi/orderapiplatform:v1.0
     ports:
       - "8080:8080"
     environment:
