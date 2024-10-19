@@ -24,7 +24,7 @@ public class OrderController {
     }
 
     // Endpoint for canceling an existing order
-    @PostMapping("/cancel-order")
+    @PutMapping("/cancel-order")
     public ResponseEntity<String> cancelOrder(@RequestParam Long orderId) {
         String responseMessage = orderService.cancelOrder(orderId);
         return ResponseEntity.ok(responseMessage);
