@@ -2,11 +2,14 @@ package org.example.zerobeta.Exception;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,5 +69,38 @@ class GlobalExceptionHandlerTest {
         Map<String, String> expectedErrors = new HashMap<>();
         expectedErrors.put("fieldName", "Field error message");
         assertEquals(expectedErrors, response.getBody());
+    }
+
+    @Test
+    void testHandleMissingParams() {
+        String paramName = "testParam";
+        MissingServletRequestParameterException exception = new MissingServletRequestParameterException(paramName, "String");
+
+        ResponseEntity<String> response = globalExceptionHandler.handleMissingParams(exception);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(paramName + " parameter is missing", response.getBody());
+    }
+
+    @Test
+    void testHandleDataIntegrityViolationException() {
+        String errorMessage = "Duplicate entry";
+        DataIntegrityViolationException exception = new DataIntegrityViolationException(errorMessage);
+
+        ResponseEntity<String> response = globalExceptionHandler.handleDataIntegrityViolationException(exception);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Duplicate entry detected: " + errorMessage, response.getBody());
+    }
+
+    @Test
+    void testHandleBadCredentialsException() {
+        String errorMessage = "Bad credentials";
+        BadCredentialsException exception = new BadCredentialsException(errorMessage);
+
+        ResponseEntity<String> response = globalExceptionHandler.handleBadCredentialsException(exception);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Invalid credentials: " + errorMessage, response.getBody());
     }
 }

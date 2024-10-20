@@ -4,6 +4,7 @@ import org.example.zerobeta.Config.JwtService;
 import org.example.zerobeta.DTO.AuthenticationRequestDto;
 import org.example.zerobeta.DTO.AuthenticationResponseDTO;
 import org.example.zerobeta.DTO.RegisterRequestDto;
+import org.example.zerobeta.Exception.CustomException;
 import org.example.zerobeta.Model.Client;
 import org.example.zerobeta.Repository.ClientRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class AuthServiceImplTest {
@@ -47,7 +49,7 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void testRegister_Success() {
+    void testRegisterSuccess() {
         // Arrange
         RegisterRequestDto request = new RegisterRequestDto("John", "Doe", "john.doe@example.com", "password");
         Client client = new Client();
@@ -72,37 +74,33 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void testRegister_EmailAlreadyExists() {
+    void testRegisterEmailAlreadyExists() {
         // Arrange
         RegisterRequestDto request = new RegisterRequestDto("Jane", "Doe", "jane.doe@example.com", "password");
         when(clientRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(new Client()));
 
-        // Act
-        ResponseEntity<AuthenticationResponseDTO> response = authService.register(request);
-
-        // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Email already exists: jane.doe@example.com", response.getBody().getMessage());
+        // Act and Assert
+        assertThrows(CustomException.class, () -> {
+            authService.register(request);
+        });
     }
 
     @Test
-    void testRegister_DataIntegrityViolation() {
+    void testRegisterDataIntegrityViolation() {
         // Arrange
         RegisterRequestDto request = new RegisterRequestDto("Jane", "Doe", "jane.doe@example.com", "password");
         when(clientRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
         when(clientRepository.save(any(Client.class))).thenThrow(new DataIntegrityViolationException("Duplicate entry"));
 
-        // Act
-        ResponseEntity<AuthenticationResponseDTO> response = authService.register(request);
-
-        // Assert
-        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals("An error occurred: Duplicate entry detected.", response.getBody().getMessage());
+        // Act and Assert
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            authService.register(request);
+        });
     }
 
     @Test
-    void testAuthenticate_Success() {
+    void testAuthenticateSuccess() {
         // Arrange
         AuthenticationRequestDto request = new AuthenticationRequestDto("john.doe@example.com", "password");
         Client client = new Client();
@@ -126,23 +124,20 @@ class AuthServiceImplTest {
         assertEquals("jwtToken", response.getBody().getToken());
     }
 
-
     @Test
-    void testAuthenticate_UserNotFound() {
+    void testAuthenticateUserNotFound() {
         // Arrange
         AuthenticationRequestDto request = new AuthenticationRequestDto("unknown@example.com", "password");
         when(clientRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
 
-        // Act
-        ResponseEntity<AuthenticationResponseDTO> response = authService.authenticate(request);
-
-        // Assert
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("User not found with email: unknown@example.com", response.getBody().getMessage());
+        // Act and Assert
+        assertThrows(CustomException.class, () -> {
+            authService.authenticate(request);
+        });
     }
 
     @Test
-    void testAuthenticate_InvalidCredentials() {
+    void testAuthenticateInvalidCredentials() {
         // Arrange
         AuthenticationRequestDto request = new AuthenticationRequestDto("john.doe@example.com", "wrongPassword");
         Client client = new Client();
@@ -150,13 +145,11 @@ class AuthServiceImplTest {
         client.setEmail("john.doe@example.com");
 
         when(clientRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(client));
-        doThrow(new BadCredentialsException("Invalid credentials")).when(authenticationManager).authenticate(any());
+        doThrow(new BadCredentialsException("Invalid credentials")).when(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
 
-        // Act
-        ResponseEntity<AuthenticationResponseDTO> response = authService.authenticate(request);
-
-        // Assert
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid credentials: Incorrect password.", response.getBody().getMessage());
+        // Act and Assert
+        assertThrows(BadCredentialsException.class, () -> {
+            authService.authenticate(request);
+        });
     }
 }

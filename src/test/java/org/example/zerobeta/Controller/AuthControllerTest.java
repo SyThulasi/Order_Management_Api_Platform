@@ -44,7 +44,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    void testRegister_Success() throws Exception {
+    void testRegisterSuccess() throws Exception {
         RegisterRequestDto registerRequest = new RegisterRequestDto("John", "Doe", "john@example.com", "password");
         AuthenticationResponseDTO responseDTO = new AuthenticationResponseDTO("dummyToken", "Client registered successfully!");
         when(authService.register(registerRequest)).thenReturn(ResponseEntity.ok(responseDTO));
@@ -57,7 +57,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    void testRegister_InvalidRequest() throws Exception {
+    void testRegisterInvalidRequest() throws Exception {
         RegisterRequestDto registerRequest = new RegisterRequestDto("", "", "invalid_email", "");
         mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -66,7 +66,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    void testAuthenticate_Success() throws Exception {
+    void testAuthenticateSuccess() throws Exception {
         AuthenticationRequestDto authRequest = new AuthenticationRequestDto("john@example.com", "password");
         AuthenticationResponseDTO responseDTO = new AuthenticationResponseDTO("dummyToken", "Client logged in successfully!");
         when(authService.authenticate(authRequest)).thenReturn(ResponseEntity.ok(responseDTO));
@@ -79,7 +79,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    void testAuthenticate_InvalidCredentials() throws Exception {
+    void testAuthenticateInvalidCredentials() throws Exception {
         AuthenticationRequestDto authRequest = new AuthenticationRequestDto("john@example.com", "wrong_password");
         when(authService.authenticate(authRequest)).thenReturn(ResponseEntity.status(401).body(new AuthenticationResponseDTO(null, "Invalid credentials")));
         mockMvc.perform(post("/api/v1/auth/authenticate")

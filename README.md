@@ -42,7 +42,7 @@ This platform is built using Spring Boot and MySQL, and it supports Docker for e
 
 The following diagram illustrates the relationships between the `Client` and `Order` tables.
 
-![ERD](assets/erdiagram.png)
+![ERD](assets/erd.png)
 ## API Endpoints
 
 ### Client Endpoints:
@@ -74,6 +74,24 @@ You can find the source code of this project on GitHub:
 ## Docker Link
 You can find the Docker image and instructions here:
 
+## Running the Application via Docker Compose
+
+### Step 1: Set Up the `docker-compose.yml` File
+
+The **docker-compose.yml** file can be found in the [GitHub repository](https://github.com/SyThulasi/Order_Management_Api_Platform).
+
+### Step 2: Pull the Docker Image from Docker Hub
+
+Run the following command to pull the Docker image from docker hub :
+
+```bash
+docker pull your-dockerhub-username/order-management-api:latest
+```
+### Step 3: Run the Application with Docker Compose
+Once the docker-compose.yml file is in place, run the following command to start both services
+```bash
+docker-compose up
+```
 ## Setup Instructions
 
 1. **Clone the Repository:**

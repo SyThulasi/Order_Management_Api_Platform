@@ -115,18 +115,18 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toList());
     }
 
-    // Update all NEW orders to DISPATCHED
+    // Update all NEW orders to DISPATCH
     @Transactional
     public void updateNewOrdersToDispatched() {
         // Find all NEW orders
         List<Order> newOrders = orderRepository.findByStatus(OrderStatus.NEW);
 
-        // Update each order's status to DISPATCHED
+        // Update each order's status to DISPATCH
         newOrders.forEach(order -> {
             order.setStatus(OrderStatus.DISPATCHED);
             orderRepository.save(order);  // Save the updated order
         });
 
-        log.info("Updated " + newOrders.size() + " orders from NEW to DISPATCHED.");
+        log.info("Updated {} orders from NEW to DISPATCHED.", newOrders.size());
     }
 }

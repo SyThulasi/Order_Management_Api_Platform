@@ -16,6 +16,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration {
 
     private final AuthenticationProvider authenticationProvider;
+    private static final String LOG_IN = "/api/v1/auth/authenticate";
+    private static final String REGISTER = "/api/v1/auth/register";
 
     // Define security filter chain configuration
     @Bean
@@ -24,7 +26,7 @@ public class SecurityConfiguration {
                 // Disable CSRF (since using stateless session with JWT)
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers(REGISTER,LOG_IN).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

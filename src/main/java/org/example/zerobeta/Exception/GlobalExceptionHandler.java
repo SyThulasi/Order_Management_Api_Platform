@@ -1,9 +1,12 @@
 package org.example.zerobeta.Exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -38,5 +41,23 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    // Handle missing request parameter exception
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<String> handleMissingParams(MissingServletRequestParameterException ex) {
+        String name = ex.getParameterName();
+        return new ResponseEntity<>(name + " parameter is missing", HttpStatus.BAD_REQUEST);
+    }
+    // Handle DataIntegrityViolationException (e.g., duplicate email)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public final ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        return  new ResponseEntity<>("Duplicate entry detected: " + ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    // Handle BadCredentialsException for login failures
+    @ExceptionHandler(BadCredentialsException.class)
+    public final ResponseEntity<String> handleBadCredentialsException(BadCredentialsException ex) {
+        return new ResponseEntity<>( "Invalid credentials: " + ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 }

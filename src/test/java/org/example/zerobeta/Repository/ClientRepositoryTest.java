@@ -48,7 +48,7 @@ class ClientRepositoryTest {
     }
 
     @Test
-    void testFindByEmail_NotFound() {
+    void testFindByEmailNotFound() {
         Optional<Client> foundClient = clientRepository.findByEmail("notfound@example.com");
 
         assertThat(foundClient).isNotPresent();

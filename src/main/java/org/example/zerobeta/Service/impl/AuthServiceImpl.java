@@ -5,15 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.example.zerobeta.Config.JwtService;
 import org.example.zerobeta.DTO.AuthenticationRequestDto;
 import org.example.zerobeta.DTO.RegisterRequestDto;
+import org.example.zerobeta.Exception.CustomException;
 import org.example.zerobeta.Model.Client;
 import org.example.zerobeta.Repository.ClientRepository;
 import org.example.zerobeta.DTO.AuthenticationResponseDTO;
 import org.example.zerobeta.Service.AuthService;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
 
         // Check if email is already registered
         if (clientRepository.findByEmail(request.getEmail()).isPresent()) {
-            return createResponseEntity(null, "Email already exists: " + request.getEmail(), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Email already exists: " + request.getEmail());
         }
 
         // Create new client
@@ -44,18 +43,10 @@ public class AuthServiceImpl implements AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
 
-        try {
-            clientRepository.save(client);
-            var jwtToken = jwtService.generateToken(client);
-            return createResponseEntity(jwtToken, "Client registered successfully!", HttpStatus.CREATED);
+        clientRepository.save(client);
+        var jwtToken = jwtService.generateToken(client);
 
-        } catch (DataIntegrityViolationException e) {
-            return createResponseEntity(null, "An error occurred: Duplicate entry detected.", HttpStatus.CONFLICT);
-
-        } catch (Exception e) {
-            return createResponseEntity(null, "An unexpected error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-
-        }
+        return createResponseEntity(jwtToken, "Client registered successfully!", HttpStatus.CREATED);
     }
 
     // Handles user authentication (login)
@@ -63,32 +54,30 @@ public class AuthServiceImpl implements AuthService {
     public ResponseEntity<AuthenticationResponseDTO> authenticate(@Valid AuthenticationRequestDto request) {
 
         var clientOptional = clientRepository.findByEmail(request.getEmail());
+
         if (clientOptional.isEmpty()) {
-            return createResponseEntity(null, "User not found with email: " + request.getEmail(), HttpStatus.NOT_FOUND);
+            throw new CustomException("User not found with email: " + request.getEmail());
         }
 
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getEmail(),
-                            request.getPassword()
-                    )
-            );
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
 
-            var client = clientOptional.get();
-            var jwtToken = jwtService.generateToken(client);
-            return createResponseEntity(jwtToken,"Client logged in successfully!",HttpStatus.OK);
+        var client = clientOptional.get();
+        var jwtToken = jwtService.generateToken(client);
 
-        } catch (BadCredentialsException e) {
-            return createResponseEntity(null, "Invalid credentials: Incorrect password.", HttpStatus.UNAUTHORIZED);
-
-        } catch (Exception e) {
-            return createResponseEntity(null, "An error occurred during authentication: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return createResponseEntity(jwtToken, "Client logged in successfully!", HttpStatus.OK);
     }
 
     // Utility method to create response entity for authentication/register requests
-    private ResponseEntity<AuthenticationResponseDTO> createResponseEntity(String token, String message, HttpStatus status) {
+    private ResponseEntity<AuthenticationResponseDTO> createResponseEntity(
+            String token,
+            String message,
+            HttpStatus status
+    ) {
         return ResponseEntity.status(status).body(AuthenticationResponseDTO.builder()
                 .token(token)
                 .message(message)
