@@ -18,5 +18,16 @@ public class OrderResponseDTO {
     private int quantity;
     private OrderStatus status;
     private LocalDateTime timestamp;
+
+    @Override
+    public String toString() {
+        return "OrderResponseDTO{" +
+                "reference number=" + id + 
+                ", itemName='" + itemName + '\'' +
+                ", quantity=" + quantity +
+                ", status=" + status +
+                ", timestamp=" + timestamp +
+                '}';
+    }
 }
 
