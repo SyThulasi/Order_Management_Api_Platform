@@ -57,6 +57,12 @@ The following diagram illustrates the relationships between the `Client` and `Or
 ## Security
 - **JWT-based authentication:** All endpoints (except signup and login) require a valid JWT token in the authorization header.
 
+### How JWT works
+
+The following diagram illustrates that how JWT authorizaition works
+
+![ERD](assets/jwt_arc.png)
+
 ## Technologies Used
 - **Spring Boot** / Java
 - **MySQL**
@@ -73,6 +79,7 @@ You can find the source code of this project on GitHub:
 
 ## Docker Link
 You can find the Docker image and instructions here:
+[Order Management API Platform](https://hub.docker.com/repository/docker/sythulasi/orderapiplatform/general)
 
 ## Running the Application via Docker Compose
 
@@ -85,7 +92,7 @@ The **docker-compose.yml** file can be found in the [GitHub repository](https://
 Run the following command to pull the Docker image from docker hub :
 
 ```bash
-docker pull your-dockerhub-username/order-management-api:latest
+docker pull sythulasi/orderapiplatform:v1.0
 ```
 ### Step 3: Run the Application with Docker Compose
 Once the docker-compose.yml file is in place, run the following command to start both services
@@ -96,20 +103,20 @@ docker-compose up
 
 1. **Clone the Repository:**
     ```bash
-    git clone https://github.com/SyThulasi/Order_Management_Api_Platform
+    git clone https://github.com/SyThulasi/Order_Management_Api_Platform.git
     cd order-management-api
     ```
 
 2. **Set Up MySQL:**  
    Ensure MySQL is installed and running, then create the required database:
     ```sql
-    CREATE DATABASE order_management;
+    CREATE DATABASE order_management_system;
     ```
 
 3. **Configure the Application:**  
    Edit the `application.properties` file to configure your MySQL credentials:
     ```properties
-    spring.datasource.url=jdbc:mysql://localhost:3306/order_management
+    spring.datasource.url=jdbc:mysql://localhost:3306/order_management_system
     spring.datasource.username=your-username
     spring.datasource.password=your-password
     ```
@@ -125,4 +132,4 @@ docker-compose up
     - **Log in:** `http://localhost:8080/api/v1/auth/authenticate`
     - **Place an order:** `http://localhost:8080/api/order/place-order`
     - **Cancel an order:** `http://localhost:8080/api/order/cancel-order?order_id={}`
-    - **Get order history:** `http://localhost:8080/api/orders/history?page=0&size=10`
+    - **Get order history:** `http://localhost:8080/api/orders/history?page={}&size={} `
